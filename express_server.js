@@ -1,6 +1,35 @@
 const express = require("express");
+const bodyParser = require("body-parser");
+const { application } = require("express");
 const app = express();
 const PORT = 8080; // default port 8080
+
+const generateRandomString = function() {
+  const max = 123;
+  const min = 48;
+  const results = [];
+
+  while (results.length < 6) {
+    const randomNumber = Math.random() * (max - min) + min;
+    if (randomNumber >= 48 && randomNumber <= 57) {
+      results.push(String.fromCharCode(randomNumber));
+    }
+
+    if (randomNumber >= 65 && randomNumber <= 90) {
+      results.push(String.fromCharCode(randomNumber));
+    }
+
+    if (randomNumber >= 97 && randomNumber <= 122) {
+      results.push(String.fromCharCode(randomNumber));
+    }
+  }
+
+  return results.join('');
+};
+
+console.log(generateRandomString());
+
+app.use(bodyParser.urlencoded({extended: true}));
 
 app.set('view engine', 'ejs');
 
@@ -26,12 +55,16 @@ app.get("/urls", (req, res) => {
   res.render('urls_index', templateVars);
 });
 
-app.get("/hello", (req, res) => {
-  const templateVars = { greeting: 'Hello World!' };
-  res.render("hello_world", templateVars);
+app.get('/urls/new', (req, res) => {
+  res.render('urls_new');
 });
 
 app.get('/urls/:shortURL', (req, res) => {
   const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase };
   res.render('urls_show', templateVars);
+});
+
+app.post('/urls', (req, res) => {
+  console.log(req.body);
+  res.send('Ok');
 });
