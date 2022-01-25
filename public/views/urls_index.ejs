@@ -24,16 +24,26 @@
         <% for(let url in urls) { %>
           <tr>
             <td><%= url %></td>
-            <td><%= urls[url] %></td>
+            <td>
+              <%= urls[url] %>
+              <a href=<%= `/urls/${url}` %>>
+                <span title='edit'>
+                  <img src='./images/edit.png' style='width: 25px;height: 25px;'>
+                </span>
+              </a>
+            </td>
             <td>
               <% const fullUrl = `/urls/${url}/delete` %>
               <form method="POST" action=<%= fullUrl %>>
-                <button style="font-size: 16px;
+                <button style="
+                  font-size: 16px;
                   padding: 5px 10px;
-                  background-color: white; 
-                  color: #f44336; 
+                  background-color: white;
+                  color: #f44336;
                   border: 2px solid #f44336;
-                  border-radius:8px;">Delete</button>
+                  border-radius:8px">
+                  Delete
+                </button>
               </form>
             </td>
           </tr>

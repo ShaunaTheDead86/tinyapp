@@ -28,6 +28,7 @@ const generateRandomString = function() {
 };
 
 app.use(bodyParser.urlencoded({extended: true}));
+app.use(express.static('public'));
 
 app.set('view engine', 'ejs');
 
@@ -50,22 +51,26 @@ app.get("/urls.json", (req, res) => {
 
 app.get("/urls", (req, res) => {
   const templateVars = { urls: urlDatabase };
-  res.render('urls_index', templateVars);
+  res.render('../public/views/urls_index', templateVars);
 });
 
 app.get('/urls/new', (req, res) => {
-  res.render('urls_new');
+  res.render('../public/views/urls_new');
 });
 
 app.post('/urls', (req, res) => {
   const shortURL = generateRandomString();
+  const longURL = req.body.longURL;
+  const editedShortURL = Object.keys(urlDatabase).find(key => urlDatabase[key] === longURL);
+  console.log(editedShortURL);
+
   urlDatabase[shortURL] = req.body.longURL;
   res.redirect(`/u/${shortURL}`);
 });
 
 app.get('/urls/:shortURL', (req, res) => {
-  const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase };
-  res.render('urls_show', templateVars);
+  const templateVars = { shortURL: urlDatabase[req.body.shortURL], longURL: urlDatabase };
+  res.render('../public/views/urls_show', templateVars);
 });
 
 app.get('/u/:shortURL', (req, res) => {
