@@ -88,7 +88,7 @@ app.get('/login', (req, res) => {
 
 // GET WITH VARIABLE INPUT
 app.get('/urls/:shortURL', (req, res) => {
-  const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL], username: req.cookies['user_id'] };
+  const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL], user: req.cookies['user_id'] };
   res.render('urls_show', templateVars);
 });
 
@@ -117,7 +117,11 @@ app.post('/login', (req, res) => {
   const userID = findUserID(req.body.email);
 
   if (!users[userID]) {
-    return res.redirect(400, '/register');
+    return res.status(403).send('No user with that email address');
+  }
+
+  if (users[userID].password !== req.body.password) {
+    return res.status(403).send('Your password doesn\'t match the password on file');
   }
 
   res.cookie('user_id', users[userID]);
@@ -132,8 +136,12 @@ app.post('/logout', (req, res) => {
 app.post('/register', (req, res) => {
   const userID = findUserID(req.body.email);
 
+  if (req.body.email === '' || req.body.email === undefined || req.body.password === '' || req.body.password === undefined) {
+    return res.status(400).send('You didn\'t fill in a required field for registering a new user.');
+  }
+
   if (users[userID] || req.body.email === '' || req.body.password === '') {
-    return res.redirect(400, '/register');
+    return res.status(400).send('That user already exists');
   }
 
   let newUserID = generateRandomString();
