@@ -94,7 +94,18 @@ app.get("/urls.json", (req, res) => {
 });
 
 app.get("/urls", (req, res) => {
-  const templateVars = { urls: urlDatabase, user: req.cookies['user_id'] };
+  const userID = req.cookies['user_id'];
+  const userDatabase = {};
+
+  if (userID !== undefined) {
+    for (const item in urlDatabase) {
+      if (urlDatabase[item].userID === userID.id) {
+        userDatabase[item] = urlDatabase[item];
+      }
+    }
+  }
+
+  const templateVars = { urls: userDatabase, user: req.cookies['user_id'] };
   res.render('urls_index', templateVars);
 });
 
