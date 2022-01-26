@@ -8,22 +8,21 @@
       <div class="navbar-nav">
         <a class="nav-item nav-link" href="/urls">My URLs</a>
         <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
-      </div>
     </div>
-    <div>
-      <% if (username) { %>
-          <form class="form-inline" action="/logout" method="POST">
-              <label class="navbar-item nav-link" style="color: #ffffff;font-size:16px;font-weight:bold">Logged in as: </label>
-              <label class="navbar-item nav-link" style="font-size:18px;font-weight:bold;color:#ffffff"><%= username %></label>
-              <button type="submit" class="btn btn-primary" style="background-color:#ff0000;border-color:#ff0000;font-weight:bold">Logout</button>
+    <div style="position:absolute;right:15px;">
+        <% if (username) { %>
+            <form class="form-inline" action="/logout" method="POST">
+                <p class="navbar-brand" style="margin-top:10px">Logged in as: </p>
+                <p class="navbar-brand" style="margin-top:10px"><%= username %></p>
+                <button type="submit" class="btn btn-primary" style="margin-left:15px;background-color:#ff0000;border-color:#ff0000;font-weight:bold">Logout</button>
+            </form>
+        <% } else { %>
+          <form class="form-inline" action="/login" method="POST">
+              <p class="navbar-brand" style="margin-top:10px">Login:</p>
+              <input class="nav-item nav-link form-control" type="text" name="username" placeholder="Username" style="width: 125px">
+              <button type="submit" class="btn btn-primary" style="margin-left:15px;background-color:#0011ff;border-color:#0011ff;font-weight:bold">Submit</button>
           </form>
-      <% } else { %>
-        <form class="form-inline" action="/login" method="POST">
-            <label class="nav-item nav-link" for="username" style="color: #ffffff;font-size:16px;font-weight:bold">Login:</label>
-            <input class="nav-item nav-link form-control" type="text" name="username" placeholder="Username" style="width: 125px">
-            <button type="submit" class="btn btn-primary" style="margin-left:15px;background-color:#0011ff;border-color:#0011ff;font-weight:bold">Submit</button>
-        </form>
-      <% } %>
+        <% } %>
     </div>
   </nav>
 </header>
