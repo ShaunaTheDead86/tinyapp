@@ -8,21 +8,26 @@
       <div class="navbar-nav">
         <a class="nav-item nav-link" href="/urls">My URLs</a>
         <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
-    </div>
-    <div style="position:absolute;right:15px;">
-        <% if (username) { %>
+      </div>
+      <div style="position:absolute;right:15px;">
+        <% if (locals.user) { %>
             <form class="form-inline" action="/logout" method="POST">
                 <p class="navbar-brand" style="margin-top:10px">Logged in as: </p>
-                <p class="navbar-brand" style="margin-top:10px"><%= username %></p>
+                <p class="navbar-brand" style="margin-top:10px"><%= locals.user.email %></p>
                 <button type="submit" class="btn btn-primary" style="margin-left:15px;background-color:#ff0000;border-color:#ff0000;font-weight:bold">Logout</button>
             </form>
         <% } else { %>
           <form class="form-inline" action="/login" method="POST">
               <p class="navbar-brand" style="margin-top:10px">Login:</p>
-              <input class="nav-item nav-link form-control" type="text" name="username" placeholder="Username" style="width: 125px">
+              <input class="nav-item nav-link form-control" type="text" name="email" placeholder="example@google.ca" style="width: 200px">
+              <input class="nav-item nav-link form-control" type="text" name="password" placeholder="Password" style="margin-left:15px;width: 150px">
               <button type="submit" class="btn btn-primary" style="margin-left:15px;background-color:#0011ff;border-color:#0011ff;font-weight:bold">Submit</button>
+              <div class="navbar-nav">
+                <a class="navbar-brand" href="/register" style="margin-left:15px">Register</a>
+              </div>
           </form>
         <% } %>
+      </div>
     </div>
   </nav>
 </header>
