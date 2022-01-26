@@ -39,6 +39,21 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
+const users = {
+  // USER TEMPLATE
+  // "userRandomID": {
+  //   id: "userRandomID",
+  //   email: "user@example.com",
+  //   password: "purple-monkey-dinosaur"
+  // },
+  // "user2RandomID": {
+  //   id: "user2RandomID",
+  //   email: "user2@example.com",
+  //   password: "dishwasher-funk"
+  // }
+};
+
+
 // LISTENER
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
@@ -61,7 +76,7 @@ app.get('/urls/new', (req, res) => {
 
 app.get('/register', (req, res) => {
   const templateVars = { username: req.cookies["username"] };
-  res.render('/user_form', templateVars);
+  res.render('user_form', templateVars);
 });
 
 app.get('/urls/:shortURL', (req, res) => {
@@ -89,6 +104,38 @@ app.post('/urls', (req, res) => {
 
   res.redirect('urls');
 });
+
+app.post('/register', (req, res) => {
+  let newUserID = generateRandomString();
+
+  // if the randomly generated string already exists in the database, keep generating new strings until we get one that doesn't
+  while (users[newUserID]) {
+    newUserID = generateRandomString();
+  }
+
+  const newUserInfo = {
+    id: newUserID,
+    email: req.body.email,
+    password: req.body.password
+  };
+
+  users[newUserID] = newUserInfo;
+
+  res.cookie('user_id',users[newUserID]);
+  res.redirect('/urls');
+});
+
+// USER TEMPLATE
+// "userRandomID": {
+//   id: "userRandomID",
+//   email: "user@example.com",
+//   password: "purple-monkey-dinosaur"
+// },
+// "user2RandomID": {
+//   id: "user2RandomID",
+//   email: "user2@example.com",
+//   password: "dishwasher-funk"
+// }
 
 app.post('/urls/:shortURL', (req, res) => {
   res.redirect(`/urls/${req.params.shortURL}`);

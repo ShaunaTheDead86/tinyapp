@@ -14,10 +14,27 @@
       </div>
       <div class="card-body">
         <form action="/register" method="POST">
-          <label for='email'>Email Address:</label>
-          <input type="text" name='email' type='email' placeholder="example@google.ca" style="width: 300px; margin: 1em">
-          <label for='password'>Password:</label>
-          <input type="text" name='password' type='password' placeholder="example@google.ca" style="width: 300px; margin: 1em">
+          <table style="margin:auto">
+            <colgroup>
+              <tr>
+                <td>
+                  <label for='email'>Email Address:</label>
+                </td>
+                <td>
+                  <input type="text" name='email' type='email' placeholder="example@google.ca" style="width: 300px; margin: 1em">
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <label for='password'>Password:</label>
+                </td>
+                <td>
+                  <input type="text" name='password' type='password' placeholder="" style="width: 300px; margin: 1em">
+                </td>
+              </tr>
+            </colgroup>
+          </div>
+        </table>
       </div>
     <div class="card-footer text-muted">
         <button type="submit" class="btn btn-primary">Submit</button>
