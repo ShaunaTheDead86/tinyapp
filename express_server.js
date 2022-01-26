@@ -48,7 +48,6 @@ app.get("/urls.json", (req, res) => {
 });
 
 app.get("/urls", (req, res) => {
-  console.log('/urls req.body', req.body);
   const templateVars = { urls: urlDatabase };
   res.render('../public/views/urls_index', templateVars);
 });
@@ -65,8 +64,16 @@ app.get('/urls/:shortURL', (req, res) => {
 // POST
 app.post('/urls', (req, res) => {
   const shortURL = req.body.shortURL;
+  const longURL = req.body.longURL;
   const editURL = req.body.editURL;
-  urlDatabase[shortURL] = editURL;
+
+  if (urlDatabase[shortURL]) {
+    urlDatabase[shortURL] = editURL;
+  } else {
+    const newShortURL = generateRandomString();
+    urlDatabase[newShortURL] = longURL;
+  }
+
   res.redirect('urls');
 });
 
@@ -77,4 +84,9 @@ app.post('/urls/:shortURL', (req, res) => {
 app.post('/urls/:shortURL/delete', (req, res) => {
   delete urlDatabase[req.params.shortURL];
   res.redirect('/urls');
+});
+
+app.get("/u/:shortURL", (req, res) => {
+  const longURL = urlDatabase[req.body.shortURL];
+  res.redirect(longURL);
 });
