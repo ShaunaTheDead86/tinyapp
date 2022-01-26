@@ -38,6 +38,20 @@ const findUserID = function(email) {
   return null;
 };
 
+const cleanURL = function(url) {
+  const httpRegex = /^(http|https):\/\//;
+  const wwwPrefix = /(www.)/;
+
+  if (!url.match(httpRegex)) {
+    if (!url.match(wwwPrefix)) {
+      url = 'www.' + url;
+    }
+    url = 'https://' + url;
+  }
+
+  return url;
+};
+
 // MIDDLEWARE
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieParser());
@@ -94,14 +108,19 @@ app.get('/urls/:shortURL', (req, res) => {
 
 app.get("/u/:shortURL", (req, res) => {
   const longURL = urlDatabase[req.params.shortURL];
+  console.log(longURL);
   res.redirect(longURL);
 });
 
 // POST
 app.post('/urls', (req, res) => {
   const shortURL = req.body.shortURL;
-  const longURL = req.body.longURL;
-  const editURL = req.body.editURL;
+  const longURL = cleanURL(req.body.longURL);
+  let editURL = '';
+
+  if (req.body.editURL !== undefined) {
+    editURL = cleanURL(req.body.editURL);
+  }
 
   if (urlDatabase[shortURL]) {
     urlDatabase[shortURL] = editURL;
