@@ -17,15 +17,20 @@
                 <button type="submit" class="btn btn-primary" style="margin-left:15px;background-color:#ff0000;border-color:#ff0000;font-weight:bold">Logout</button>
             </form>
         <% } else { %>
-          <form class="form-inline" action="/login" method="POST">
-              <p class="navbar-brand" style="margin-top:10px">Login:</p>
-              <input class="nav-item nav-link form-control" type="text" name="email" placeholder="example@google.ca" style="width: 200px">
-              <input class="nav-item nav-link form-control" type="text" name="password" placeholder="Password" style="margin-left:15px;width: 150px">
-              <button type="submit" class="btn btn-primary" style="margin-left:15px;background-color:#0011ff;border-color:#0011ff;font-weight:bold">Submit</button>
-              <div class="navbar-nav">
-                <a class="navbar-brand" href="/register" style="margin-left:15px">Register</a>
-              </div>
-          </form>
+          <table>
+            <tr>
+              <td>
+                <a class="nav-item nav-link" href="/login">
+                  <button type="link" class="btn btn-primary" style="background-color:#ffb443;border-color:#ffb443;font-weight:bold">Login</button>
+                </a>
+              </td>
+              <td>
+                <a class="nav-item nav-link" href="/login">
+                  <button type="link" class="btn btn-primary" style="background-color:#4e4eff;border-color:#4e4eff;font-weight:bold">Register</button>
+                </a>
+              </td>
+            </tr>
+          </table>
         <% } %>
       </div>
     </div>

@@ -81,6 +81,11 @@ app.get('/register', (req, res) => {
   res.render('user_form', templateVars);
 });
 
+app.get('/login', (req, res) => {
+  const templateVars = { user: req.cookies['user_id'] };
+  res.render('login_form', templateVars);
+});
+
 // GET WITH VARIABLE INPUT
 app.get('/urls/:shortURL', (req, res) => {
   const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL], username: req.cookies['user_id'] };
@@ -110,13 +115,12 @@ app.post('/urls', (req, res) => {
 
 app.post('/login', (req, res) => {
   const userID = findUserID(req.body.email);
-  console.log(userID);
-  console.log(users[userID]);
 
-  if (users[userID]) {
-    res.cookie('user_id', users[userID]);
+  if (!users[userID]) {
+    return res.redirect(400, '/register');
   }
-  
+
+  res.cookie('user_id', users[userID]);
   res.redirect('/urls');
 });
 
