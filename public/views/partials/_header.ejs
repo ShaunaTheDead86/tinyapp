@@ -9,19 +9,21 @@
         <a class="nav-item nav-link" href="/urls">My URLs</a>
         <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
       </div>
-      <div class="collapse navbar-collapse" id="navbarLogin">
+    </div>
+    <div>
+      <% if (username) { %>
+          <form class="form-inline" action="/logout" method="POST">
+              <label class="navbar-item nav-link" style="color: #ffffff;font-size:16px;font-weight:bold">Logged in as: </label>
+              <label class="navbar-item nav-link" style="font-size:18px;font-weight:bold;color:#ffffff"><%= username %></label>
+              <button type="submit" class="btn btn-primary" style="background-color:#ff0000;border-color:#ff0000;font-weight:bold">Logout</button>
+          </form>
+      <% } else { %>
         <form class="form-inline" action="/login" method="POST">
-          <div class="form-group mb-2">
-            <label class="nav-item nav-link" for="username">Login:</label>
-            <input class="nav-item nav-link form-control" type="text" name="username" placeholder="Username" style="width: 150px">
-            <button type="submit" class="btn btn-primary" style="margin-left:15px">Submit</button>
-            <label class="navbar-item nav-link" style="color: #ffffff"><%= username %></label>
-          </div>
+            <label class="nav-item nav-link" for="username" style="color: #ffffff;font-size:16px;font-weight:bold">Login:</label>
+            <input class="nav-item nav-link form-control" type="text" name="username" placeholder="Username" style="width: 125px">
+            <button type="submit" class="btn btn-primary" style="margin-left:15px;background-color:#0011ff;border-color:#0011ff;font-weight:bold">Submit</button>
         </form>
-      </div>
-      <div class="navbar-nav">
-        
-      </div>
+      <% } %>
     </div>
   </nav>
 </header>
