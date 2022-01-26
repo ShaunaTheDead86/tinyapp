@@ -80,7 +80,6 @@ app.get("/urls.json", (req, res) => {
 });
 
 app.get("/urls", (req, res) => {
-  console.log(users);
   const templateVars = { urls: urlDatabase, user: req.cookies['user_id'] };
   res.render('urls_index', templateVars);
 });
@@ -108,7 +107,6 @@ app.get('/urls/:shortURL', (req, res) => {
 
 app.get("/u/:shortURL", (req, res) => {
   const longURL = urlDatabase[req.params.shortURL];
-  console.log(longURL);
   res.redirect(longURL);
 });
 
