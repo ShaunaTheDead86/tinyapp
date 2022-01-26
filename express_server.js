@@ -66,6 +66,7 @@ app.get("/urls.json", (req, res) => {
 });
 
 app.get("/urls", (req, res) => {
+  console.log(users);
   const templateVars = { urls: urlDatabase, user: req.cookies['user_id'] };
   res.render('urls_index', templateVars);
 });
@@ -114,11 +115,7 @@ app.post('/login', (req, res) => {
 
   if (users[userID]) {
     res.cookie('user_id', users[userID]);
-  } else {
-    console.log('user not found');
   }
-
-  console.log(users);
   
   res.redirect('/urls');
 });
@@ -129,6 +126,12 @@ app.post('/logout', (req, res) => {
 });
 
 app.post('/register', (req, res) => {
+  const userID = findUserID(req.body.email);
+
+  if (users[userID] || req.body.email === '' || req.body.password === '') {
+    return res.redirect(400, '/register');
+  }
+
   let newUserID = generateRandomString();
 
   // if the randomly generated string already exists in the database, keep generating new strings until we get one that doesn't
