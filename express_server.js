@@ -52,6 +52,20 @@ const cleanURL = function(url) {
   return url;
 };
 
+const urlsForUser = function(id) {
+  const results = {};
+  
+  if (id !== undefined) {
+    for (const item in urlDatabase) {
+      if (urlDatabase[item].userID === id) {
+        results[item] = urlDatabase[item];
+      }
+    }
+  }
+
+  return results;
+};
+
 // MIDDLEWARE
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieParser());
@@ -94,17 +108,11 @@ app.get("/urls.json", (req, res) => {
 });
 
 app.get("/urls", (req, res) => {
-  const userID = req.cookies['user_id'];
-  const userDatabase = {};
-
-  if (userID !== undefined) {
-    for (const item in urlDatabase) {
-      if (urlDatabase[item].userID === userID.id) {
-        userDatabase[item] = urlDatabase[item];
-      }
-    }
+  let userID;
+  if (req.cookies['user_id'] !== undefined) {
+    userID = req.cookies['user_id'].id;
   }
-
+  const userDatabase = urlsForUser(userID);
   const templateVars = { urls: userDatabase, user: req.cookies['user_id'] };
   res.render('urls_index', templateVars);
 });
@@ -126,7 +134,13 @@ app.get('/login', (req, res) => {
 
 // GET WITH VARIABLE INPUT
 app.get('/urls/:shortURL', (req, res) => {
-  const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL].longURL, user: req.cookies['user_id'] };
+  let userID;
+  if (req.cookies['user_id'] !== undefined) {
+    userID = req.cookies['user_id'].id;
+  }
+  const userDatabase = urlsForUser(userID);
+
+  const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL].longURL, user: req.cookies['user_id'], userURLs: userDatabase };
   res.render('urls_show', templateVars);
 });
 
@@ -156,13 +170,11 @@ app.post('/urls', (req, res) => {
   } else {
     const userID = req.cookies['user_id'].id;
     const newShortURL = generateRandomString();
-    console.log(longURL, userID);
     urlDatabase[newShortURL] = {
       longURL: longURL,
       userID: userID
     };
   }
-  console.log(urlDatabase);
 
   res.redirect('urls');
 });
@@ -219,11 +231,33 @@ app.post('/register', (req, res) => {
 
 // POST WITH VARIABLE INPUT
 app.post('/urls/:shortURL', (req, res) => {
+  const shortURL = req.params.shortURL;
+  
+  if (req.cookies['user_id'] !== undefined) {
+    const userID = req.cookies['user_id'].id;
+    if (urlDatabase[shortURL].userID !== userID) {
+      return res.status(403).send('You don\'t have access to that');
+    }
+  } else {
+    return res.status(403).send('You are not logged in, please login and try again');
+  }
+
   res.redirect(`/urls/${req.params.shortURL}`);
 });
 
 app.post('/urls/:shortURL/delete', (req, res) => {
-  delete urlDatabase[req.params.shortURL];
+  const shortURL = req.params.shortURL;
+
+  if (req.cookies['user_id'] !== undefined) {
+    const userID = req.cookies['user_id'].id;
+    if (urlDatabase[shortURL].userID !== userID) {
+      return res.status(403).send('You don\'t have access to that');
+    }
+  } else {
+    return res.status(403).send('You are not logged in, please login and try again');
+  }
+
+  delete urlDatabase[shortURL];
   res.redirect('/urls');
 });
 
