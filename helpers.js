@@ -57,16 +57,12 @@ const urlsForUser = function(id, database) {
   return results;
 };
 
-const clearInvalidCookies = function(session, database) {
+const checkLoggedIn = function(session) {
   if (!session['user_id']) {
-    return null;
+    return false;
+  } else {
+    return true;
   }
-  
-  if (!database[session['user_id'].id]) {
-    return null;
-  }
-
-  return session;
 };
 
 module.exports = {
@@ -74,5 +70,5 @@ module.exports = {
   getUserByEmail,
   cleanURL,
   urlsForUser,
-  clearInvalidCookies
+  checkLoggedIn
 };

@@ -3,7 +3,7 @@ const bodyParser = require("body-parser");
 const cookieSession = require("cookie-session");
 const bcrypt = require('bcryptjs');
 const { application } = require("express");
-const { generateRandomString, getUserByEmail, cleanURL, urlsForUser, clearInvalidCookies } = require('./helpers');
+const { generateRandomString, getUserByEmail, cleanURL, urlsForUser, checkLoggedIn } = require('./helpers');
 const app = express();
 const PORT = 8080; // default port 8080
 
@@ -39,10 +39,15 @@ const urlDatabase = {
   'b2xVn2': {
     longURL: "http://www.google.com",
     userID: "aJ48lW"
+  },
+  'test': {
+    longURL: 'http://www.google.com',
+    userID: 'test'
   }
 };
 
 const users = {
+  userID: 'test'
 };
 
 const visitors = {
@@ -60,10 +65,8 @@ app.get("/urls.json", (req, res) => {
 });
 
 app.get("/", (req, res) => {
-  if (!req.session['user_id']) {
+  if (!checkLoggedIn(req.session)) {
     res.redirect('/login');
-  } else {
-    res.redirect('urls');
   }
 });
 
@@ -81,6 +84,10 @@ app.get("/urls", (req, res) => {
 });
 
 app.get('/urls/new', (req, res) => {
+  if (!checkLoggedIn(req.session)) {
+    res.redirect('/login');
+  }
+
   const templateVars = { user: req.session['user_id'] };
   res.render('urls_new', templateVars);
 });
@@ -97,7 +104,12 @@ app.get('/login', (req, res) => {
 
 // GET WITH VARIABLE INPUT
 app.get('/urls/:shortURL', (req, res) => {
+  if (!urlDatabase[req.params.shortURL]) {
+    return res.status(404).send('That short URL does not exist');
+  }
+
   let userID;
+
   if (req.session['user_id']) {
     userID = req.session['user_id'].id;
   }
@@ -108,6 +120,11 @@ app.get('/urls/:shortURL', (req, res) => {
 });
 
 app.get("/u/:shortURL", (req, res) => {
+
+  if (!urlDatabase[req.params.shortURL]) {
+    return res.status(404).send('That short URL does not exist');
+  }
+
   const longURL = urlDatabase[req.params.shortURL].longURL;
 
   // increment visits every time
@@ -124,13 +141,13 @@ app.get("/u/:shortURL", (req, res) => {
 
 // POST
 app.post('/urls', (req, res) => {
-  const shortURL = req.body.shortURL;
-  const longURL = cleanURL(req.body.longURL);
-  let editURL = '';
-  
   if (!req.session['user_id']) {
     return res.status(403).send('You don\'t have access to do that');
   }
+
+  const shortURL = req.body.shortURL;
+  const longURL = cleanURL(req.body.longURL);
+  let editURL = '';
 
   if (req.body.editURL !== undefined) {
     editURL = cleanURL(req.body.editURL);
