@@ -4,11 +4,11 @@ TinyApp is a full stack web application built with Node and Express that allows 
 
 ## Final Product
 
-!['Register a new account'](https://raw.githubusercontent.com/ShaunaTheDead86/tinyapp/main/docs/register_page.png)
+!["Register a new account"](https://raw.githubusercontent.com/ShaunaTheDead86/tinyapp/main/docs/register_page.png)
 
-!['Create and edit your short URLs'](https://raw.githubusercontent.com/ShaunaTheDead86/tinyapp/main/docs/edit_urls.png)
+!["Create and edit your short URLs"](https://raw.githubusercontent.com/ShaunaTheDead86/tinyapp/main/docs/edit_urls.png)
 
-!['View all of your custom short URLs'](https://raw.githubusercontent.com/ShaunaTheDead86/tinyapp/main/docs/my_urls.png)
+!["View all of your custom short URLs"](https://raw.githubusercontent.com/ShaunaTheDead86/tinyapp/main/docs/my_urls.png)
 
 ## Dependencies
 
