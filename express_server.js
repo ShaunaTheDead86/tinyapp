@@ -1,6 +1,7 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
+const bcrypt = require('bcryptjs');
 const { application } = require("express");
 const app = express();
 const PORT = 8080; // default port 8080
@@ -186,7 +187,7 @@ app.post('/login', (req, res) => {
     return res.status(403).send('No user with that email address');
   }
 
-  if (users[userID].password !== req.body.password) {
+  if (!bcrypt.compareSync(req.body.password, users[userID].password)) {
     return res.status(403).send('Your password doesn\'t match the password on file');
   }
 
@@ -220,7 +221,7 @@ app.post('/register', (req, res) => {
   const newUserInfo = {
     id: newUserID,
     email: req.body.email,
-    password: req.body.password
+    password: bcrypt.hashSync(req.body.password, 10)
   };
 
   users[newUserID] = newUserInfo;
