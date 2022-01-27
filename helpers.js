@@ -21,7 +21,7 @@ const generateRandomString = function() {
   return results.join('');
 };
 
-const findUserID = function(email, database) {
+const getUserByEmail = function(email, database) {
   for (const userID in database) {
     if (database[userID].email === email) {
       return userID;
@@ -71,7 +71,7 @@ const clearInvalidCookies = function(session, database) {
 
 module.exports = {
   generateRandomString,
-  findUserID,
+  getUserByEmail,
   cleanURL,
   urlsForUser,
   clearInvalidCookies

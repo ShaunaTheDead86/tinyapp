@@ -58,7 +58,7 @@ app.get("/urls", (req, res) => {
   } else {
     req.session = clearInvalidCookies(req.session, users);
     if (req.session === null) {
-      res.redirect('/login');
+      return res.redirect('/login');
     }
   }
 
