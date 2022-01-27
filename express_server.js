@@ -1,6 +1,6 @@
 const express = require("express");
 const bodyParser = require("body-parser");
-const cookieParser = require("cookie-parser");
+const cookieSession = require("cookie-session");
 const bcrypt = require('bcryptjs');
 const { application } = require("express");
 const app = express();
@@ -30,9 +30,9 @@ const generateRandomString = function() {
   return results.join('');
 };
 
-const findUserID = function(email) {
-  for (const userID in users) {
-    if (users[userID].email === email) {
+const findUserID = function(email, database) {
+  for (const userID in database) {
+    if (database[userID].email === email) {
       return userID;
     }
   }
@@ -63,14 +63,24 @@ const urlsForUser = function(id) {
       }
     }
   }
-
   return results;
+};
+
+const clearInvalidCookies = function(session, database) {
+  if (!database[session.id]) {
+    return null;
+  }
+  return session;
 };
 
 // MIDDLEWARE
 app.use(bodyParser.urlencoded({extended: true}));
-app.use(cookieParser());
 app.use(express.static('public'));
+app.use(cookieSession({
+  name: 'user_id',
+  keys: ['key1'],
+  signed: false
+}));
 
 // EJS SETTINGS
 app.set('view engine', 'ejs');
@@ -109,54 +119,73 @@ app.get("/urls.json", (req, res) => {
 });
 
 app.get("/urls", (req, res) => {
-  let userID;
-  if (req.cookies['user_id'] !== undefined) {
-    userID = req.cookies['user_id'].id;
+  if (req.session !== null) {
+    // req.session = clearInvalidCookies(req.session, users);
+    if (req.session === null) {
+      res.redirect('/login');
+    }
   }
+
+  let userID;
+
+  if (req.session !== null) {
+    userID = req.session.id;
+  }
+
   const userDatabase = urlsForUser(userID);
-  const templateVars = { urls: userDatabase, user: req.cookies['user_id'] };
+  const templateVars = { urls: userDatabase, user: req.session };
   res.render('urls_index', templateVars);
 });
 
 app.get('/urls/new', (req, res) => {
-  const templateVars = { user: req.cookies['user_id'] };
+  // req.session = clearInvalidCookies(req.session, users);
+  const templateVars = { user: req.session };
   res.render('urls_new', templateVars);
 });
 
 app.get('/register', (req, res) => {
-  const templateVars = { user: req.cookies['user_id'] };
+  // req.session = clearInvalidCookies(req.session, users);
+  const templateVars = { user: req.session };
   res.render('user_form', templateVars);
 });
 
 app.get('/login', (req, res) => {
-  const templateVars = { user: req.cookies['user_id'] };
+  if (req.session['user_id'] !== null) {
+    // req.session = clearInvalidCookies(req.session, users);
+  }
+
+  const templateVars = { user: req.session };
   res.render('login_form', templateVars);
 });
 
 // GET WITH VARIABLE INPUT
 app.get('/urls/:shortURL', (req, res) => {
+  // req.session = clearInvalidCookies(req.session, users);
   let userID;
-  if (req.cookies['user_id'] !== undefined) {
-    userID = req.cookies['user_id'].id;
+  if (req.session !== null) {
+    userID = req.session.id;
   }
   const userDatabase = urlsForUser(userID);
 
-  const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL].longURL, user: req.cookies['user_id'], userURLs: userDatabase };
+  const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL].longURL, user: req.session, userURLs: userDatabase };
   res.render('urls_show', templateVars);
 });
 
 app.get("/u/:shortURL", (req, res) => {
+  // req.session = clearInvalidCookies(req.session, users);
   const longURL = urlDatabase[req.params.shortURL].longURL;
   res.redirect(longURL);
 });
 
 // POST
 app.post('/urls', (req, res) => {
+  req.session = clearInvalidCookies(req.session, users);
+  
   const shortURL = req.body.shortURL;
   const longURL = cleanURL(req.body.longURL);
   let editURL = '';
   
-  if (!req.cookies.user_id) {
+  if (!req.session) {
     return res.status(403).send('You don\'t have access to do that');
   }
 
@@ -165,11 +194,11 @@ app.post('/urls', (req, res) => {
   }
 
   if (urlDatabase[shortURL]) {
-    const userID = req.cookies['user_id'].id;
+    const userID = req.session.id;
     urlDatabase[shortURL].longURL = editURL;
     urlDatabase[shortURL].userID = userID;
   } else {
-    const userID = req.cookies['user_id'].id;
+    const userID = req.session.id;
     const newShortURL = generateRandomString();
     urlDatabase[newShortURL] = {
       longURL: longURL,
@@ -181,7 +210,8 @@ app.post('/urls', (req, res) => {
 });
 
 app.post('/login', (req, res) => {
-  const userID = findUserID(req.body.email);
+  // req.session = clearInvalidCookies(req.session, users);
+  const userID = findUserID(req.body.email, users);
 
   if (!users[userID]) {
     return res.status(403).send('No user with that email address');
@@ -191,17 +221,18 @@ app.post('/login', (req, res) => {
     return res.status(403).send('Your password doesn\'t match the password on file');
   }
 
-  res.cookie('user_id', users[userID]);
+  req.session = users[userID];
   res.redirect('/urls');
 });
 
 app.post('/logout', (req, res) => {
-  res.clearCookie('user_id');
+  req.session = null;
   res.redirect('/urls');
 });
 
 app.post('/register', (req, res) => {
-  const userID = findUserID(req.body.email);
+  // req.session = clearInvalidCookies(req.session, users);
+  const userID = findUserID(req.body.email, users);
 
   if (req.body.email === '' || req.body.email === undefined || req.body.password === '' || req.body.password === undefined) {
     return res.status(400).send('You didn\'t fill in a required field for registering a new user.');
@@ -226,16 +257,17 @@ app.post('/register', (req, res) => {
 
   users[newUserID] = newUserInfo;
 
-  res.cookie('user_id',users[newUserID]);
+  req.session = users[newUserID];
   res.redirect('/urls');
 });
 
 // POST WITH VARIABLE INPUT
 app.post('/urls/:shortURL', (req, res) => {
+  // req.session = clearInvalidCookies(req.session, users);
   const shortURL = req.params.shortURL;
   
-  if (req.cookies['user_id'] !== undefined) {
-    const userID = req.cookies['user_id'].id;
+  if (req.session !== null) {
+    const userID = req.session.id;
     if (urlDatabase[shortURL].userID !== userID) {
       return res.status(403).send('You don\'t have access to that');
     }
@@ -247,10 +279,11 @@ app.post('/urls/:shortURL', (req, res) => {
 });
 
 app.post('/urls/:shortURL/delete', (req, res) => {
+  // req.session = clearInvalidCookies(req.session, users);
   const shortURL = req.params.shortURL;
 
-  if (req.cookies['user_id'] !== undefined) {
-    const userID = req.cookies['user_id'].id;
+  if (req.session !== null) {
+    const userID = req.session.id;
     if (urlDatabase[shortURL].userID !== userID) {
       return res.status(403).send('You don\'t have access to that');
     }

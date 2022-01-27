@@ -1,7 +1,8 @@
 <header>
   <nav class="navbar navbar-expand-md navbar-dark bg-success">
     <a class="navbar-brand" href="/urls">TinyApp</a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup"
+      aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
@@ -10,28 +11,33 @@
         <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
       </div>
       <div style="position:absolute;right:15px;">
-        <% if (locals.user) { %>
-            <form class="form-inline" action="/logout" method="POST">
-                <p class="navbar-brand" style="margin-top:10px">Logged in as: </p>
-                <p class="navbar-brand" style="margin-top:10px"><%= locals.user.email %></p>
-                <button type="submit" class="btn btn-primary" style="margin-left:15px;background-color:#ff0000;border-color:#ff0000;font-weight:bold">Logout</button>
-            </form>
-        <% } else { %>
-          <table>
-            <tr>
-              <td>
-                <a class="nav-item nav-link" href="/login">
-                  <button type="link" class="btn btn-primary" style="background-color:#ffb443;border-color:#ffb443;font-weight:bold">Login</button>
-                </a>
-              </td>
-              <td>
-                <a class="nav-item nav-link" href="/register">
-                  <button type="link" class="btn btn-primary" style="background-color:#4e4eff;border-color:#4e4eff;font-weight:bold">Register</button>
-                </a>
-              </td>
-            </tr>
-          </table>
-        <% } %>
+        <% if (user) { %>
+          <form class="form-inline" action="/logout" method="POST">
+            <p class="navbar-brand" style="margin-top:10px">Logged in as: </p>
+            <p class="navbar-brand" style="margin-top:10px">
+              <%= user.email %>
+            </p>
+            <button type="submit" class="btn btn-primary"
+              style="margin-left:15px;background-color:#ff0000;border-color:#ff0000;font-weight:bold">Logout</button>
+          </form>
+          <% } else { %>
+            <table>
+              <tr>
+                <td>
+                  <a class="nav-item nav-link" href="/login">
+                    <button type="link" class="btn btn-primary"
+                      style="background-color:#ffb443;border-color:#ffb443;font-weight:bold">Login</button>
+                  </a>
+                </td>
+                <td>
+                  <a class="nav-item nav-link" href="/register">
+                    <button type="link" class="btn btn-primary"
+                      style="background-color:#4e4eff;border-color:#4e4eff;font-weight:bold">Register</button>
+                  </a>
+                </td>
+              </tr>
+            </table>
+            <% } %>
       </div>
     </div>
   </nav>
