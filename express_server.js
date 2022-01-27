@@ -3,7 +3,7 @@ const bodyParser = require("body-parser");
 const cookieSession = require("cookie-session");
 const bcrypt = require('bcryptjs');
 const { application } = require("express");
-const { generateRandomString, findUserID, cleanURL, urlsForUser, clearInvalidCookies } = require('./helpers');
+const { generateRandomString, getUserByEmail, cleanURL, urlsForUser, clearInvalidCookies } = require('./helpers');
 const app = express();
 const PORT = 8080; // default port 8080
 
@@ -136,7 +136,7 @@ app.post('/urls', (req, res) => {
 });
 
 app.post('/login', (req, res) => {
-  const userID = findUserID(req.body.email, users);
+  const userID = getUserByEmail(req.body.email, users);
 
   if (!users[userID]) {
     return res.status(403).send('No user with that email address');
@@ -156,7 +156,7 @@ app.post('/logout', (req, res) => {
 });
 
 app.post('/register', (req, res) => {
-  const userID = findUserID(req.body.email, users);
+  const userID = getUserByEmail(req.body.email, users);
 
   if (req.body.email === '' || req.body.email === undefined || req.body.password === '' || req.body.password === undefined) {
     return res.status(400).send('You didn\'t fill in a required field for registering a new user.');
