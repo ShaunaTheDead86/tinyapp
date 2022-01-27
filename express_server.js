@@ -67,13 +67,14 @@ const urlsForUser = function(id) {
 };
 
 const clearInvalidCookies = function(session, database) {
-  if (!session) {
+  if (!session['user_id']) {
     return null;
   }
   
-  if (!database[session.id]) {
+  if (!database[session['user_id'].id]) {
     return null;
   }
+
   return session;
 };
 
@@ -123,6 +124,15 @@ app.get("/urls.json", (req, res) => {
 });
 
 app.get("/urls", (req, res) => {
+  if (!req.session['user_id']) {
+    res.redirect('/login');
+  } else {
+    req.session = clearInvalidCookies(req.session, users);
+    if (req.session === null) {
+      res.redirect('/login');
+    }
+  }
+
   let userID;
 
   if (req.session['user_id']) {
