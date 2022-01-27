@@ -52,16 +52,15 @@ app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
 });
 
-app.get("/urls", (req, res) => {
+app.get("/", (req, res) => {
   if (!req.session['user_id']) {
     res.redirect('/login');
   } else {
-    req.session = clearInvalidCookies(req.session, users);
-    if (req.session === null) {
-      return res.redirect('/login');
-    }
+    res.redirect('urls');
   }
+});
 
+app.get("/urls", (req, res) => {
   let userID;
 
   if (req.session['user_id']) {
