@@ -23,7 +23,10 @@ app.set('view engine', 'ejs');
 const urlDatabase = {
   'b6UTxQ': {
     longURL: "https://www.tsn.ca",
-    userID: "aJ48lW"
+    userID: "aJ48lW",
+    created: Date.now(),
+    visits: 0,
+    uniqueVisits: 0
   },
   'i3BoGr': {
     longURL: "https://www.google.ca",
@@ -40,6 +43,10 @@ const urlDatabase = {
 };
 
 const users = {
+};
+
+const visitors = {
+
 };
 
 // LISTENER
@@ -68,6 +75,7 @@ app.get("/urls", (req, res) => {
   }
 
   const userDatabase = urlsForUser(userID, urlDatabase);
+  console.log(userDatabase);
   const templateVars = { urls: userDatabase, user: req.session['user_id'] };
   res.render('urls_index', templateVars);
 });
@@ -101,6 +109,16 @@ app.get('/urls/:shortURL', (req, res) => {
 
 app.get("/u/:shortURL", (req, res) => {
   const longURL = urlDatabase[req.params.shortURL].longURL;
+
+  // increment visits every time
+  urlDatabase[req.params.shortURL].visits++;
+
+  // check if visit has a unique ip, increment unique visits if ip is not in the vistors list
+  if (!visitors[req.ip]) {
+    visitors[req.ip] = req.ip;
+    urlDatabase[req.params.shortURL].uniqueVisits++;
+  }
+
   res.redirect(longURL);
 });
 
@@ -120,14 +138,22 @@ app.post('/urls', (req, res) => {
 
   if (urlDatabase[shortURL]) {
     const userID = req.session['user_id'].id;
-    urlDatabase[shortURL].longURL = editURL;
-    urlDatabase[shortURL].userID = userID;
+    urlDatabase[shortURL] = {
+      longURL: editURL,
+      userID: userID,
+      created: new Date(Date.now()).toLocaleDateString(),
+      visits: 0,
+      uniqueVisits: 0
+    };
   } else {
     const userID = req.session['user_id'].id;
     const newShortURL = generateRandomString();
     urlDatabase[newShortURL] = {
       longURL: longURL,
-      userID: userID
+      userID: userID,
+      created: new Date(Date.now()).toLocaleDateString(),
+      visits: 0,
+      uniqueVisits: 0
     };
   }
 
