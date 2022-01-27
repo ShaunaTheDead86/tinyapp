@@ -44,13 +44,13 @@ const cleanURL = function(url) {
   return url;
 };
 
-const urlsForUser = function(id) {
+const urlsForUser = function(id, database) {
   const results = {};
   
   if (id !== undefined) {
-    for (const item in urlDatabase) {
-      if (urlDatabase[item].userID === id) {
-        results[item] = urlDatabase[item];
+    for (const item in database) {
+      if (database[item].userID === id) {
+        results[item] = database[item];
       }
     }
   }

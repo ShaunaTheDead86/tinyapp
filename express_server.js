@@ -68,7 +68,7 @@ app.get("/urls", (req, res) => {
     userID = req.session['user_id'].id;
   }
 
-  const userDatabase = urlsForUser(userID);
+  const userDatabase = urlsForUser(userID, users);
   const templateVars = { urls: userDatabase, user: req.session['user_id'] };
   res.render('urls_index', templateVars);
 });
@@ -94,7 +94,7 @@ app.get('/urls/:shortURL', (req, res) => {
   if (req.session['user_id']) {
     userID = req.session['user_id'].id;
   }
-  const userDatabase = urlsForUser(userID);
+  const userDatabase = urlsForUser(userID, users);
 
   const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL].longURL, user: req.session['user_id'], userURLs: userDatabase };
   res.render('urls_show', templateVars);
