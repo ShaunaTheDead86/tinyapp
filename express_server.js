@@ -3,6 +3,7 @@ const bodyParser = require("body-parser");
 const cookieSession = require("cookie-session");
 const bcrypt = require('bcryptjs');
 const { application } = require("express");
+const methodOverride = require('method-override');
 const { generateRandomString, getUserByEmail, cleanURL, urlsForUser, checkLoggedIn } = require('./helpers');
 const app = express();
 const PORT = 8080; // default port 8080
@@ -15,6 +16,7 @@ app.use(cookieSession({
   keys: ['key1'],
   signed: false
 }));
+app.use(methodOverride('_method'));
 
 // EJS SETTINGS
 app.set('view engine', 'ejs');
@@ -139,6 +141,33 @@ app.get("/u/:shortURL", (req, res) => {
   res.redirect(longURL);
 });
 
+// PUT
+
+app.put('/urls', (req, res) => {
+  if (!req.session['user_id']) {
+    return res.status(403).send('You don\'t have access to do that');
+  }
+
+  const shortURL = req.body.shortURL;
+  let editURL = '';
+
+  if (req.body.editURL !== undefined) {
+    editURL = cleanURL(req.body.editURL);
+  }
+
+  const userID = req.session['user_id'].id;
+  urlDatabase[shortURL] = {
+    longURL: editURL,
+    userID: userID,
+    created: new Date(Date.now()).toLocaleDateString(),
+    visits: 0,
+    uniqueVisits: 0
+  };
+
+  
+  res.redirect('urls');
+});
+
 // POST
 app.post('/urls', (req, res) => {
   if (!req.session['user_id']) {
@@ -146,33 +175,23 @@ app.post('/urls', (req, res) => {
   }
 
   const shortURL = req.body.shortURL;
-  const longURL = cleanURL(req.body.longURL);
+  const longURL = req.body.longURL;
   let editURL = '';
 
   if (req.body.editURL !== undefined) {
     editURL = cleanURL(req.body.editURL);
   }
 
-  if (urlDatabase[shortURL]) {
-    const userID = req.session['user_id'].id;
-    urlDatabase[shortURL] = {
-      longURL: editURL,
-      userID: userID,
-      created: new Date(Date.now()).toLocaleDateString(),
-      visits: 0,
-      uniqueVisits: 0
-    };
-  } else {
-    const userID = req.session['user_id'].id;
-    const newShortURL = generateRandomString();
-    urlDatabase[newShortURL] = {
-      longURL: longURL,
-      userID: userID,
-      created: new Date(Date.now()).toLocaleDateString(),
-      visits: 0,
-      uniqueVisits: 0
-    };
-  }
+  const userID = req.session['user_id'].id;
+  const newShortURL = generateRandomString();
+
+  urlDatabase[newShortURL] = {
+    longURL: longURL,
+    userID: userID,
+    created: new Date(Date.now()).toLocaleDateString(),
+    visits: 0,
+    uniqueVisits: 0
+  };
 
   res.redirect('urls');
 });
@@ -243,7 +262,8 @@ app.post('/urls/:shortURL', (req, res) => {
   res.redirect(`/urls/${req.params.shortURL}`);
 });
 
-app.post('/urls/:shortURL/delete', (req, res) => {
+// DELETE
+app.delete('/urls/:shortURL/delete', (req, res) => {
   const shortURL = req.params.shortURL;
 
   if (req.session['user_id']) {
