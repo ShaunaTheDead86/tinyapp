@@ -48,13 +48,9 @@ const urlDatabase = {
   }
 };
 
-const users = {
-  userID: 'test'
-};
+const users = {};
 
-const visitors = {
-
-};
+const visitors = {};
 
 // LISTENER
 app.listen(PORT, () => {
@@ -117,7 +113,7 @@ app.get('/urls/:shortURL', (req, res) => {
   }
   const userDatabase = urlsForUser(userID, urlDatabase);
 
-  const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL].longURL, user: req.session['user_id'], userURLs: userDatabase };
+  const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL].longURL, user: req.session['user_id'], userURLs: userDatabase, visitors: visitors };
   res.render('urls_show', templateVars);
 });
 
@@ -134,7 +130,7 @@ app.get("/u/:shortURL", (req, res) => {
 
   // check if visit has a unique ip, increment unique visits if ip is not in the vistors list
   if (!visitors[req.ip]) {
-    visitors[req.ip] = req.ip;
+    visitors[req.ip] = { visitorID: generateRandomString(), time: new Date(Date.now()).toLocaleDateString() };
     urlDatabase[req.params.shortURL].uniqueVisits++;
   }
 

@@ -26,7 +26,16 @@
               </h5>
               <h5 class="card-text">Unique Visits: <%= userURLs[shortURL].uniqueVisits %>
               </h5>
-              </p>
+              <h5 class="card-text">
+                <% for (const visitor in visitors) { %>
+                  <h5 class="card-text">
+                    <h5>VisitorID: <%= visitors[visitor].visitorID %>
+                    </h5>
+                    <h5>Visited on: <%= visitors[visitor].time %>
+                    </h5>
+                  </h5>
+                  <% } %>
+              </h5>
           </div>
           <div class="card-footer text-muted">
             <form action="/urls?_method=PUT" method="POST">
