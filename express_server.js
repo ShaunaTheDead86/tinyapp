@@ -60,7 +60,7 @@ const users = {};
 
 const visitors = {};
 
-const targetURL = '';
+const targetURL = 'https://shauna-tiny-app.herokuapp.com';
 
 // LISTENER
 app.listen(PORT, () => {
