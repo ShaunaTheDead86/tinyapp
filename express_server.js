@@ -60,25 +60,23 @@ const users = {};
 
 const visitors = {};
 
-const targetURL = 'https://shauna-tiny-app.herokuapp.com';
-
 // LISTENER
 app.listen(PORT, () => {
 	console.log(`Example app listening on port ${PORT}!`);
 });
 
 // GET
-app.get(targetURL + '/urls.json', (req, res) => {
+app.get('/urls.json', (req, res) => {
 	res.json(urlDatabase);
 });
 
-app.get(targetURL + '/', (req, res) => {
+app.get('/', (req, res) => {
 	if (!checkLoggedIn(req.session)) {
-		res.redirect(targetURL + '/login');
+		res.redirect('/login');
 	}
 });
 
-app.get(targetURL + '/urls', (req, res) => {
+app.get('/urls', (req, res) => {
 	let userID;
 
 	if (req.session['user_id']) {
@@ -90,27 +88,27 @@ app.get(targetURL + '/urls', (req, res) => {
 	res.render('urls_index', templateVars);
 });
 
-app.get(targetURL + '/urls/new', (req, res) => {
+app.get('/urls/new', (req, res) => {
 	if (!checkLoggedIn(req.session)) {
-		res.redirect(targetURL + '/login');
+		res.redirect('/login');
 	}
 
 	const templateVars = { user: req.session['user_id'] };
 	res.render('urls_new', templateVars);
 });
 
-app.get(targetURL + '/register', (req, res) => {
+app.get('/register', (req, res) => {
 	const templateVars = { user: req.session['user_id'] };
 	res.render('user_form', templateVars);
 });
 
-app.get(targetURL + '/login', (req, res) => {
+app.get('/login', (req, res) => {
 	const templateVars = { user: req.session['user_id'] };
 	res.render('login_form', templateVars);
 });
 
 // GET WITH VARIABLE INPUT
-app.get(targetURL + '/urls/:shortURL', (req, res) => {
+app.get('/urls/:shortURL', (req, res) => {
 	if (!urlDatabase[req.params.shortURL]) {
 		return res.status(404).send('That short URL does not exist');
 	}
@@ -132,7 +130,7 @@ app.get(targetURL + '/urls/:shortURL', (req, res) => {
 	res.render('urls_show', templateVars);
 });
 
-app.get(targetURL + '/u/:shortURL', (req, res) => {
+app.get('/u/:shortURL', (req, res) => {
 	if (!urlDatabase[req.params.shortURL]) {
 		return res.status(404).send('That short URL does not exist');
 	}
@@ -156,7 +154,7 @@ app.get(targetURL + '/u/:shortURL', (req, res) => {
 
 // PUT
 
-app.put(targetURL + '/urls', (req, res) => {
+app.put('/urls', (req, res) => {
 	if (!req.session['user_id']) {
 		return res.status(403).send("You don't have access to do that");
 	}
@@ -177,11 +175,11 @@ app.put(targetURL + '/urls', (req, res) => {
 		uniqueVisits: 0
 	};
 
-	res.redirect(targetURL + '/urls');
+	res.redirect('/urls');
 });
 
 // POST
-app.post(targetURL + '/urls', (req, res) => {
+app.post('/urls', (req, res) => {
 	if (!req.session['user_id']) {
 		return res.status(403).send("You don't have access to do that");
 	}
@@ -205,10 +203,10 @@ app.post(targetURL + '/urls', (req, res) => {
 		uniqueVisits: 0
 	};
 
-	res.redirect(targetURL + '/urls');
+	res.redirect('/urls');
 });
 
-app.post(targetURL + '/login', (req, res) => {
+app.post('/login', (req, res) => {
 	const userID = getUserByEmail(req.body.email, users);
 
 	if (!users[userID]) {
@@ -222,15 +220,15 @@ app.post(targetURL + '/login', (req, res) => {
 	}
 
 	req.session['user_id'] = users[userID];
-	res.redirect(targetURL + '/urls');
+	res.redirect('/urls');
 });
 
-app.post(targetURL + '/logout', (req, res) => {
+app.post('/logout', (req, res) => {
 	req.session = null;
-	res.redirect(targetURL + '/urls');
+	res.redirect('/urls');
 });
 
-app.post(targetURL + '/register', (req, res) => {
+app.post('/register', (req, res) => {
 	const userID = getUserByEmail(req.body.email, users);
 
 	if (
@@ -264,11 +262,11 @@ app.post(targetURL + '/register', (req, res) => {
 	users[newUserID] = newUserInfo;
 
 	req.session['user_id'] = users[newUserID];
-	res.redirect(targetURL + '/urls');
+	res.redirect('/urls');
 });
 
 // POST WITH VARIABLE INPUT
-app.post(targetURL + '/urls/:shortURL', (req, res) => {
+app.post('/urls/:shortURL', (req, res) => {
 	const shortURL = req.params.shortURL;
 
 	if (req.session['user_id']) {
@@ -282,11 +280,11 @@ app.post(targetURL + '/urls/:shortURL', (req, res) => {
 			.send('You are not logged in, please login and try again');
 	}
 
-	res.redirect(targetURL + `/urls/${req.params.shortURL}`);
+	res.redirect(`/urls/${req.params.shortURL}`);
 });
 
 // DELETE
-app.delete(targetURL + '/urls/:shortURL/delete', (req, res) => {
+app.delete('/urls/:shortURL/delete', (req, res) => {
 	const shortURL = req.params.shortURL;
 
 	if (req.session['user_id']) {
@@ -301,5 +299,5 @@ app.delete(targetURL + '/urls/:shortURL/delete', (req, res) => {
 	}
 
 	delete urlDatabase[shortURL];
-	res.redirect(targetURL + '/urls');
+	res.redirect('/urls');
 });
