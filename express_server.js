@@ -61,7 +61,7 @@ const users = {};
 const visitors = {};
 
 // LISTENER
-app.listen(PORT, () => {
+app.listen(process.env.PORT || 5000, () => {
 	console.log(`Example app listening on port ${PORT}!`);
 });
 
